@@ -260,27 +260,5 @@ func FromSSHToYaml(sshConfigPath string, relativeFolderPath string, outputFile s
 	if err != nil {
 		panic(err)
 	} 
-
-	y,err := yaml.Marshal(sshConfig)
-	if err != nil {
-		panic(err)
-	} 
-
-	 // Writing result or print to stdout if not outputFile is given
-	if outputFile == "" {
-		fmt.Println(string(y))
-		return
-	}
-
-	output, err := os.OpenFile(outputFile, os.O_RDWR|os.O_CREATE|os.O_TRUNC, 0664)
-	if err != nil {
-		panic(err)
-	} 
-
-	_, err = output.WriteString(string(y))
-	if err != nil {
-		panic(err)
-	}
-
 }
 
