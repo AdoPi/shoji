@@ -1,9 +1,11 @@
 {
   description = "Manage SSH keys with Nix";
   inputs.nixpkgs.url = "github:NixOS/nixpkgs/release-23.11";
+  inputs.flake-utils.url = "github:numtide/flake-utils";
   outputs = {
     self,
-    nixpkgs
+    nixpkgs,
+    flake-utils
   }: let
     systems = [
       "x86_64-linux"
@@ -11,16 +13,13 @@
       "aarch64-darwin"
       "aarch64-linux"
     ];
-
-    forAllSystems = f: builtins.listToAttrs (map (system: { name = system; value = f system; }) systems);
-  in {
-    devShells = forAllSystems (system:
-      let
-        pkgs = import nixpkgs { inherit system; };
-      in {
-        default = pkgs.mkShell {
-          buildInputs = with pkgs; [ go ];
-        };
-      });
-  };
+  in flake-utils.lib.eachSystem systems (system:
+    let
+      pkgs = import nixpkgs { inherit system; };
+    in {
+      packages.default = pkgs.callPackage ./default.nix { };
+      devShells.default = pkgs.mkShell {
+        buildInputs = self.packages.${system}.default.nativeBuildInputs;
+      };
+    });
 }
