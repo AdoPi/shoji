@@ -190,17 +190,21 @@ func FromSSHToYaml(sshConfigPath string, relativeFolderPath string, outputFile s
 			continue
 		}
 
-		switch tokens[0] {
-			case "Host": 
+		switch strings.ToLower(tokens[0]) {
+		case "include":
+			fmt.Print("Warning: Inlude keyword is not supported. Ignoring...")
+			// TODO: follow include files
+			// Parsing all files inside included folder
+		case "host": 
 			currentHostKey := strings.Join(tokens[1:], " ")
 			// Create Host 
 			currentWorkingHost := Host{}
 			currentWorkingHost.Name = currentHostKey
 			sshConfig.Hosts = append(sshConfig.Hosts,currentWorkingHost)
 			currentWorkingHostIndex = len(sshConfig.Hosts) - 1
-		case "User":
+		case "user":
 			sshConfig.Hosts[currentWorkingHostIndex].User = tokens[1]
-		case "IdentityFile":
+		case "identityfile":
 			identity := ""
 			if relativeFolderPath != "" {
 				// get filename only and read this file from given folder
@@ -234,11 +238,11 @@ func FromSSHToYaml(sshConfigPath string, relativeFolderPath string, outputFile s
 				identity = string(b)
 			}
 			sshConfig.Hosts[currentWorkingHostIndex].Identity = identity
-		case "Hostname":
+		case "hostname":
 			sshConfig.Hosts[currentWorkingHostIndex].Hostname = tokens[1]
-		case "Port":
+		case "port":
 			sshConfig.Hosts[currentWorkingHostIndex].Port = tokens[1]
-			default: 
+		default: 
 			d := sshConfig.Hosts[currentWorkingHostIndex].Data
 			sshConfig.Hosts[currentWorkingHostIndex].Data = d + line + "\n"
 		}
