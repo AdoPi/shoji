@@ -183,6 +183,13 @@ func FromSSHToYaml(sshConfigPath string, relativeFolderPath string, outputFile s
 		if strings.HasPrefix(line, "#") {
 			continue
 		}
+
+		// Ignore Include keyword
+		if strings.HasPrefix(strings.ToLower(line),"include") {
+			fmt.Println("Warning: Inlude keyword is not supported. Ignoring...")
+			continue
+		}
+
 		// Now, I can process my line
 		tokens := strings.Split(line," ")
 
@@ -191,10 +198,6 @@ func FromSSHToYaml(sshConfigPath string, relativeFolderPath string, outputFile s
 		}
 
 		switch strings.ToLower(tokens[0]) {
-		case "include":
-			fmt.Print("Warning: Inlude keyword is not supported. Ignoring...")
-			// TODO: follow include files
-			// Parsing all files inside included folder
 		case "host": 
 			currentHostKey := strings.Join(tokens[1:], " ")
 			// Create Host 
